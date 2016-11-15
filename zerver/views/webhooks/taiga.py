@@ -112,6 +112,9 @@ templates = {
         'commented': u':thought_balloon: %(user)s commented on issue **%(subject)s**.',
         'delete': u':x: %(user)s deleted issue **%(subject)s**.'
     },
+    'test':{
+        'test': u':bulb: %(user)s run a Taiga integration test',
+    },
 }
 
 
@@ -181,7 +184,7 @@ def parse_change_event(change_type, message):
     """ Parses change event. """
     evt = {}
     values = {
-        'user': message["change"]["user"]["name"],
+        'user': message["by"]["full_name"],
         'subject': message["data"]["subject"] if "subject" in list(message["data"].keys()) else message["data"]["name"]
     }
 
@@ -256,6 +259,8 @@ def parse_message(message):
                 if parsed_event: events.append(parsed_event)
         if message["change"]["comment"]:
             events.append(parse_comment(message))
+    elif message["action"] == 'test':
+        events.append({"type":"test","event":"test","values":{"user":message["by"]["full_name"]}})
 
     return events
 
